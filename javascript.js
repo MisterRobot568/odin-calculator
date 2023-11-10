@@ -31,6 +31,8 @@ let operation;
 // one of the above functions on the numbers
 function operate(a, b, operation) {
     let answer;
+    a = Number(a)
+    b = Number(b)
     if (operation == '+') {
         answer = add(a, b)
     } else if (operation == '-') {
@@ -42,7 +44,7 @@ function operate(a, b, operation) {
     } else if (operation == '**') {
         answer = exponent(a, b)
     }
-    update_answer(answer)
+    // update_answer(answer)
     return answer
 }
 
@@ -79,6 +81,18 @@ function enable_buttons() {
         elem.disabled = false;
     })
 }
+function disable_decimal() {
+    const dec_div = document.querySelector('#decimal')
+    dec_div.disabled = true
+}
+
+function id_converter(button_str) {
+    if (button_str === 'decimal') {
+        return '.'
+    } else {
+        return button_str
+    }
+}
 //function to clear the calculator
 
 
@@ -95,6 +109,7 @@ function calculator() {
     let operation = null;
     let temp
     let prev_operation
+    let converted_id
     //Listener for for button clicking
     buttons.forEach((button) => {
         button.addEventListener("click", () => {
@@ -118,8 +133,9 @@ function calculator() {
             } else if (button.id == '=') { // when we press the = button
                 if (current_val !== null) {
                     if (operation) {
+                        // console.log(prev_val, current_val, operation)
                         prev_val = operate(prev_val, current_val, operation)
-                        // disp_val += button.id + prev_val.toString();
+                        update_answer(Math.round(prev_val * 100) / 100)
                         current_val = null;
                         disable_buttons()
                     }
@@ -135,17 +151,23 @@ function calculator() {
 
             } else if (button.id === 'delete') { // if we press the delete button
                 disp_val = delete_str(disp_val);
-                current_val = Number(disp_val)
+                current_val = disp_val;
                 enable_buttons()
 
             } else { // if we're pressing numbers
                 // numbers_pressed += button.id
-                disp_val += button.id;
+                converted_id = id_converter(button.id)
+                disp_val += converted_id;
                 if (current_val === null) {
-                    current_val = Number(button.id);
+                    current_val = converted_id;
                 } else {
-                    current_val = Number(current_val.toString() + button.id)
+                    current_val = current_val.toString() + converted_id
                 }
+                if (button.id === "decimal") {
+                    disable_decimal()
+                }
+
+                // console.log("current val is:" + current_val)
             }
             disp_div.textContent = disp_val;
         });
